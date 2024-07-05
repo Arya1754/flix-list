@@ -6,11 +6,13 @@ import MovieListHeading from './components/MovieListHeading';
 import SearchBox from './components/SearchBox';
 import AddFavourite from './components/AddFavourite';
 import RemoveFavourites from './components/RemoveFavourites';
+import CustomAlert from './components/CustomAlert';
 
 const App = () => {
   const [movies, setMovies] = useState([]);
   const [favourites, setFavourites] = useState([]);
   const [searchValue, setSearchValue] = useState('');
+  const [alert, setAlert] = useState({ message: '', type: '', visible: false });
 
   useEffect(() => {
     const getMovieRequest = async (searchValue) => {
@@ -52,7 +54,7 @@ const App = () => {
     const isMovieInFavourites = favourites.find((fav) => fav.imdbID === movie.imdbID);
 
     if (isMovieInFavourites) {
-      window.alert('This movie is already in your Watchlist!');
+      setAlert({ message: 'This movie is already in your Watchlist!', type: 'warning', visible: true });
       return;
     }
 
@@ -68,8 +70,13 @@ const App = () => {
     saveToLocalStorage(newFavouriteList);
   };
 
+  const closeAlert = () => {
+    setAlert({ ...alert, visible: false });
+  };
+
   return (
     <div className="container-fluid movie-app">
+      {alert.visible && <CustomAlert message={alert.message} type={alert.type} onClose={closeAlert} />}
       <div className="row d-flex align-items-center mt-4 mb-4">
         <MovieListHeading heading="Movies" />
         <SearchBox searchValue={searchValue} setSearchValue={setSearchValue} />
