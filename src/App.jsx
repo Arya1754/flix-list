@@ -14,13 +14,22 @@ const App = () => {
 
   useEffect(() => {
     const getMovieRequest = async (searchValue) => {
-      const url = `http://www.omdbapi.com/?s=${searchValue}&apikey=263d22d8`;
+      const url = `https://www.omdbapi.com/?s=${searchValue}&apikey=263d22d8`;
 
-      const response = await fetch(url);
-      const responseJson = await response.json();
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const responseJson = await response.json();
 
-      if (responseJson.Search) {
-        setMovies(responseJson.Search);
+        if (responseJson.Search) {
+          setMovies(responseJson.Search);
+        } else {
+          setMovies([]);
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
       }
     };
 
@@ -40,15 +49,13 @@ const App = () => {
   };
 
   const addFavouriteMovie = (movie) => {
-    // Check if the movie already exists in favourites
     const isMovieInFavourites = favourites.find((fav) => fav.imdbID === movie.imdbID);
 
     if (isMovieInFavourites) {
       window.alert('This movie is already in your Watchlist!');
-      return; // Exit function early if movie already exists
+      return;
     }
 
-    // If movie is not already in favourites, add it
     const newFavouriteList = [...favourites, movie];
     setFavourites(newFavouriteList);
     saveToLocalStorage(newFavouriteList);
